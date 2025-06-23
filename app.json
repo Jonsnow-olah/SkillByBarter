@@ -1,19 +1,24 @@
 {
   "expo": {
-    "name": "lesson01",
-    "slug": "lesson01",
+    "name": "SkillByBarter_App",
+    "slug": "SkillByBarter_App",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "lesson01",
+    "icon": "./assets/images/barter_logo.png",
+    "scheme": "fashion",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/mammoth2.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#000000"
+    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/barter_logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
@@ -21,20 +26,9 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/barter_logo.png"
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
-    ],
+
     "experiments": {
       "typedRoutes": true
     }
