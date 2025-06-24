@@ -11,49 +11,14 @@ import {
   Platform,
   TouchableOpacity,
   Alert,
+  StyleSheet,
   Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import Swiper from "react-native-deck-swiper";
 import { images } from "@/constants/images";
-
-
-const allSkills = [
-  "Graphic Designer",
-  "Photoshop Editor",
-  "JavaScript Developer",
-  "React Native Developer",
-  "Motion Graphics Artist",
-  "UI/UX Designer",
-  "Full Stack Developer",
-  "Frontend Engineer",
-  "Logo Designer",
-  "Web Developer",
-];
-
-const users = [
-  {
-    id: 1,
-    name: "Lisa Smith",
-    skill: "React Native Developer",
-    image: "https://randomuser.me/api/portraits/women/45.jpg",
-  },
-  {
-    id: 2,
-    name: "John Doe",
-    skill: "Graphic Designer",
-    image: "https://randomuser.me/api/portraits/men/22.jpg",
-  },
-  {
-    id: 3,
-    name: "Sophia Williams",
-    skill: "Photoshop Editor",
-    image: "https://randomuser.me/api/portraits/women/30.jpg",
-  },
-];
 
 export default function Index() {
   const router = useRouter();
@@ -61,24 +26,25 @@ export default function Index() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [selectedGender, setSelectedGender] = useState<"Male" | "Female">("Male");
 
-  const bounceValue = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
-  const users = [
-    {
-      id: "1",
-      name: "Jane Doe",
-      skill: "Graphic Designer",
-      image: "https://randomuser.me/api/portraits/women/44.jpg",
-    },
-    {
-      id: "2",
-      name: "Mark Smith",
-      skill: "React Native Developer",
-      image: "https://randomuser.me/api/portraits/men/33.jpg",
-    },
-  ];
+  const toggleGender = (gender: "Male" | "Female") => {
+    const toValue = gender === "Male" ? 0 : 1;
+    Animated.timing(slideAnim, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start(() => {
+      setSelectedGender(gender);
+    });
+  };
+
+  const translateX = slideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "100%"],
+  });
 
   const allSkills = [
     "Graphic Designer",
@@ -112,26 +78,6 @@ export default function Index() {
     getLocationPermission();
   }, []);
 
-  useEffect(() => {
-    if (showOnboarding) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(bounceValue, {
-            toValue: -10,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(bounceValue, {
-            toValue: 0,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-        ]),
-        { iterations: 2 }
-      ).start(() => setShowOnboarding(false));
-    }
-  }, [showOnboarding]);
-
   const handleNotificationClick = () => {
     router.push("/notifications");
   };
@@ -142,75 +88,74 @@ export default function Index() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <ScrollView className="px-5">
-        <View className="flex-row justify-between px-2 mt-10 mb-3 items-start p-7">
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <ScrollView style={{ paddingHorizontal: 20 }}>
+        {/* Header */}
+        <View style={styles.headerRow}>
           <Image
             source={images.logo}
             style={{ width: 70, height: 70 }}
             resizeMode="contain"
           />
-          <View className="flex-row gap-5 mt-4">
+
+          <View style={{ flexDirection: "row", gap: 20, marginTop: 14 }}>
             <Pressable onPress={() => setSearchModalVisible(true)}>
               <Ionicons name="search" size={22} color="black" />
             </Pressable>
+
             <Pressable onPress={handleNotificationClick}>
-              <View className="relative">
-                <Ionicons name="notifications-outline" size={24} />
-                <View className="absolute top-0 right-0 w-3 h-2.5 bg-[#FF3D34] rounded-full" />
+              <View style={styles.notificationWrapper}>
+                <Ionicons name="notifications-outline" size={24} color="black" />
+                <View style={styles.redDot} />
               </View>
             </Pressable>
           </View>
         </View>
 
-        <Text className="text-lg font-bold px-7 mb-2">Freelancers near you</Text>
+        {/* Gender Filter Toggle */}
+        <View style={styles.filterWrapper}>
+          <Ionicons name="filter" size={16} color="black" style={{ marginRight: 9 }} />
+          <Text style={styles.filterLabel}>Show only</Text>
 
-        <View className="items-center justify-center -mt-4">
-          <Swiper
-            cards={users}
-            renderCard={(card) => (
-              <Animated.View
-                className="bg-white rounded-xl p-5 w-[85%] shadow-md"
-                style={{ transform: [{ translateY: bounceValue }] }}
-              >
-                <Image
-                  source={{ uri: card.image }}
-                  className="w-full h-48 rounded-xl mb-4"
-                />
-                <Text className="text-xl font-semibold">{card.name}</Text>
-                <Text className="text-gray-500">{card.skill}</Text>
-              </Animated.View>
-            )}
-            cardIndex={0}
-            backgroundColor="transparent"
-            stackSize={2}
-            disableBottomSwipe
-            disableTopSwipe
-          />
+          <View style={styles.toggleContainer}>
+            <Animated.View style={[styles.toggleSlider, { transform: [{ translateX }] }]} />
+            <TouchableOpacity
+              style={styles.toggleOption}
+              onPress={() => toggleGender("Male")}
+            >
+              <Text style={[styles.toggleText, selectedGender === "Male" && styles.activeText]}>
+                Male
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.toggleOption}
+              onPress={() => toggleGender("Female")}
+            >
+              <Text style={[styles.toggleText, selectedGender === "Female" && styles.activeText]}>
+                Female
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
-
-      {/* Onboarding Text */}
-      {showOnboarding && (
-        <View className="absolute bottom-24 w-full items-center px-5">
-          <Text className="text-center text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow">
-            Swipe left to explore skilled freelancers
-          </Text>
-        </View>
-      )}
 
       {/* Search Modal */}
       <Modal visible={searchModalVisible} animationType="slide" transparent>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 justify-center bg-black/50 px-5"
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            padding: 20,
+          }}
         >
-          <View className="bg-white rounded-lg p-5">
-            <View className="flex-row items-center border border-gray-300 rounded-md px-3 mb-4">
+          <View style={{ backgroundColor: "white", borderRadius: 10, padding: 20 }}>
+            <View style={styles.searchRow}>
               <Ionicons name="search" size={20} color="gray" />
               <TextInput
                 placeholder="Search skills..."
-                className="flex-1 px-2 py-2"
+                style={styles.searchInput}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 autoFocus
@@ -224,14 +169,20 @@ export default function Index() {
               filteredSuggestions.map((suggestion, index) => (
                 <TouchableOpacity
                   key={index}
-                  className="py-2 border-b border-gray-200"
+                  style={{
+                    paddingVertical: 10,
+                    borderBottomWidth: 1,
+                    borderColor: "#eee",
+                  }}
                   onPress={() => handleSuggestionClick(suggestion)}
                 >
-                  <Text className="text-sm text-gray-700">{suggestion}</Text>
+                  <Text style={{ fontSize: 14, color: "#333" }}>{suggestion}</Text>
                 </TouchableOpacity>
               ))
             ) : (
-              <Text className="text-sm text-gray-400 mt-2">No suggestions found</Text>
+              <Text style={{ fontSize: 13, color: "#999", marginTop: 10 }}>
+                No suggestions found
+              </Text>
             )}
           </View>
         </KeyboardAvoidingView>
@@ -239,3 +190,88 @@ export default function Index() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: 56,
+    paddingBottom: 16,
+    alignItems: "center",
+  },
+  notificationWrapper: {
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  redDot: {
+    position: "absolute",
+    top: 2,
+    right: -2,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#FF3D34",
+  },
+  filterWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+    marginTop: 10,
+    flexWrap: "wrap",
+    paddingLeft: 55,
+  },
+  filterLabel: {
+    marginRight: 10,
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#000",
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    width: 160,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#eee",
+    position: "relative",
+    overflow: "hidden",
+  },
+  toggleSlider: {
+    position: "absolute",
+    width: "50%",
+    height: "100%",
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    elevation: 3,
+  },
+  toggleOption: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  toggleText: {
+    fontSize: 14,
+    color: "#888",
+    fontWeight: "600",
+  },
+  activeText: {
+    color: "#000",
+    fontWeight: "700",
+  },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    marginBottom: 16,
+  },
+  searchInput: {
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: "#333",
+  },
+});
