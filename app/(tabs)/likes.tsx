@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-const History = () => {
+const Likes = () => {
   return (
     <View>
-      <Text>History</Text>
+      <Text>Likes</Text>
     </View>
   );
 };
 
-export default History;
+export default Likes;

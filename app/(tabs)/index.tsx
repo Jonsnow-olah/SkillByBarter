@@ -1,3 +1,5 @@
+// pages/index.tsx or your main file
+
 import { useEffect, useRef, useState } from "react";
 import {
   View,
@@ -13,12 +15,16 @@ import {
   Alert,
   StyleSheet,
   Animated,
+  PanResponder,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { images } from "@/constants/images";
+
+const { width } = Dimensions.get("window");
 
 export default function Index() {
   const router = useRouter();
@@ -97,7 +103,6 @@ export default function Index() {
             style={{ width: 70, height: 70 }}
             resizeMode="contain"
           />
-
           <View style={{ flexDirection: "row", gap: 20, marginTop: 14 }}>
             <Pressable onPress={() => setSearchModalVisible(true)}>
               <Ionicons name="search" size={22} color="black" />
@@ -136,6 +141,13 @@ export default function Index() {
               </Text>
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* Swipeable Cards */}
+        <View style={{ marginTop: 30 }}>
+          {[...Array(5)].map((_, index) => (
+            <SwipeableCard key={index} />
+          ))}
         </View>
       </ScrollView>
 
@@ -191,6 +203,81 @@ export default function Index() {
   );
 }
 
+const SwipeableCard = () => {
+  const images = [
+    "https://i.pinimg.com/736x/22/b7/1e/22b71ef3ebe466713d5b412fd98a4f01.jpg",
+    "https://i.pinimg.com/736x/f2/0a/77/f20a774ffdcea286f77dafac8ad1a977.jpg",
+    "https://i.pinimg.com/736x/c6/0d/93/c60d935093376df14b50381ac3b74402.jpg",
+  ];
+  const [index, setIndex] = useState(0);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 20,
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx > 50) {
+          setIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+        } else if (gestureState.dx < -50) {
+          setIndex((prev) => (prev + 1) % images.length);
+        }
+      },
+    })
+  ).current;
+
+  return (
+    <View style={cardStyles.cardContainer}>
+      <View {...panResponder.panHandlers}>
+        <Image
+          source={{ uri: images[index] }}
+          style={cardStyles.cardImage}
+          resizeMode="cover"
+        />
+        <View style={cardStyles.imageIndicator}>
+          {images.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                cardStyles.segment,
+                index === i && cardStyles.activeSegment,
+              ]}
+            />
+          ))}
+        </View>
+
+        <View style={cardStyles.overlay}>
+          <View style={cardStyles.overlayRow}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons name="location" size={14} color="#fff" />
+              <Text style={cardStyles.overlayText}>Lagos, Nigeria</Text>
+            </View>
+            <View style={cardStyles.starWrapper}>
+              {[...Array(5)].map((_, i) => (
+                <Ionicons key={i} name="star" size={14} color="#FFD700" />
+              ))}
+            </View>
+          </View>
+
+          <Text style={cardStyles.label}>Skill</Text>
+          <Text style={cardStyles.value}>React Native Developer</Text>
+
+          <Text style={cardStyles.label}>Name</Text>
+          <Text style={cardStyles.value}>Jane Doe</Text>
+
+          <Text style={cardStyles.label}>Gender</Text>
+          <Text style={cardStyles.value}>Female</Text>
+
+          <Text style={cardStyles.label}>Years of Experience</Text>
+          <Text style={cardStyles.value}>5 years</Text>
+
+          <TouchableOpacity style={cardStyles.matchButton}>
+            <Text style={{ color: "#fff", fontWeight: "bold" }}>Match</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   headerRow: {
     flexDirection: "row",
@@ -219,7 +306,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     marginTop: 10,
     flexWrap: "wrap",
-    paddingLeft: 55,
+    paddingLeft: 20,
   },
   filterLabel: {
     marginRight: 10,
@@ -273,5 +360,77 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 14,
     color: "#333",
+  },
+});
+
+const cardStyles = StyleSheet.create({
+  cardContainer: {
+    marginBottom: 30,
+    borderRadius: 16,
+    overflow: "hidden",
+    width: "100%",
+    maxWidth: 400,
+    alignSelf: "center",
+    height: 500,
+  },
+  cardImage: {
+    width: "100%",
+    height: "100%",
+  },
+  imageIndicator: {
+    position: "absolute",
+    top: 10,
+    alignSelf: "center",
+    flexDirection: "row",
+  },
+  segment: {
+    width: 25,
+    height: 3,
+    backgroundColor: "#FF3D34",
+    marginHorizontal: 2,
+    opacity: 0.3,
+    borderRadius: 2,
+  },
+  activeSegment: {
+    opacity: 1,
+  },
+  overlay: {
+    position: "absolute",
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    width: "100%",
+    padding: 14,
+  },
+  overlayRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  overlayText: {
+    color: "#fff",
+    marginLeft: 5,
+    fontSize: 12,
+  },
+  starWrapper: {
+    flexDirection: "row",
+    gap: 2,
+  },
+  label: {
+    fontSize: 11,
+    color: "#ccc",
+    marginTop: 6,
+  },
+  value: {
+    fontSize: 14,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  matchButton: {
+    marginTop: 12,
+    backgroundColor: "#FF3D34",
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
   },
 });

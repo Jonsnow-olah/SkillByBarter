@@ -66,7 +66,7 @@ const _Layout = () => {
       />
 
         <Tabs.Screen
-        name="history"
+        name="likes"
         options={{
           title: "",
           headerShown: false,
@@ -80,7 +80,7 @@ const _Layout = () => {
               }}
             >
               <Ionicons
-                name={focused ? "document" : "document-text-outline"}
+                name={focused ? "heart" : "heart-outline"}
                 size={24}
                 color={focused ? "#FF3D34" : "#888"}
                 style={{ marginTop: 10 }}
@@ -96,7 +96,7 @@ const _Layout = () => {
                   
                 }}
               >
-                History
+                Matches
               </Text>
             </View>
           ),
@@ -138,7 +138,7 @@ const _Layout = () => {
       />
 
         <Tabs.Screen
-        name="orders"
+        name="community"
         options={{
           title: "",
           headerShown: false,
@@ -152,7 +152,7 @@ const _Layout = () => {
               }}
             >
               <Ionicons
-                name={focused ? "cube" : "cube-outline"}
+                name={focused ? "game-controller" : "game-controller-outline"}
                 size={24}
                 color={focused ? "#FF3D34" : "#888"}
                 style={{ marginTop: 10 }}
@@ -164,7 +164,7 @@ const _Layout = () => {
                   marginTop: 5,
                 }}
               >
-                Orders
+                Touch Grass
               </Text>
             </View>
           ),

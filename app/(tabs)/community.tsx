@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-const Orders = () => {
+const Community = () => {
   return (
     <View>
       <Text>Orders</Text>
@@ -9,4 +9,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default Community;
