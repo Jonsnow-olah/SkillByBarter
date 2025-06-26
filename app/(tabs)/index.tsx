@@ -1,5 +1,3 @@
-// pages/index.tsx or your main file
-
 import { useEffect, useRef, useState } from "react";
 import {
   View,
@@ -15,16 +13,12 @@ import {
   Alert,
   StyleSheet,
   Animated,
-  PanResponder,
-  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { images } from "@/constants/images";
-
-const { width } = Dimensions.get("window");
 
 export default function Index() {
   const router = useRouter();
@@ -143,10 +137,10 @@ export default function Index() {
           </View>
         </View>
 
-        {/* Swipeable Cards */}
+        {/* Cards */}
         <View style={{ marginTop: 30 }}>
           {[...Array(5)].map((_, index) => (
-            <SwipeableCard key={index} />
+            <SkillCard key={index} router={router} />
           ))}
         </View>
       </ScrollView>
@@ -203,47 +197,30 @@ export default function Index() {
   );
 }
 
-const SwipeableCard = () => {
+const SkillCard = ({ router }: { router: any }) => {
   const images = [
-    "https://i.pinimg.com/736x/22/b7/1e/22b71ef3ebe466713d5b412fd98a4f01.jpg",
-    "https://i.pinimg.com/736x/f2/0a/77/f20a774ffdcea286f77dafac8ad1a977.jpg",
-    "https://i.pinimg.com/736x/c6/0d/93/c60d935093376df14b50381ac3b74402.jpg",
+    "https://i.pinimg.com/736x/8d/76/20/8d7620777b861070a2e07e9defd4879f.jpg",
+    "https://via.placeholder.com/300x600.png?text=Portrait+2",
+    "https://via.placeholder.com/300x600.png?text=Portrait+3",
   ];
   const [index, setIndex] = useState(0);
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 20,
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dx > 50) {
-          setIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-        } else if (gestureState.dx < -50) {
-          setIndex((prev) => (prev + 1) % images.length);
-        }
-      },
-    })
-  ).current;
+  const handlePress = () => {
+    setIndex((prev) => (prev + 1) % images.length);
+  };
 
   return (
-    <View style={cardStyles.cardContainer}>
-      <View {...panResponder.panHandlers}>
-        <Image
-          source={{ uri: images[index] }}
-          style={cardStyles.cardImage}
-          resizeMode="cover"
-        />
+    <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
+      <View style={cardStyles.cardContainer}>
+        <Image source={{ uri: images[index] }} style={cardStyles.cardImage} resizeMode="cover" />
         <View style={cardStyles.imageIndicator}>
           {images.map((_, i) => (
             <View
               key={i}
-              style={[
-                cardStyles.segment,
-                index === i && cardStyles.activeSegment,
-              ]}
+              style={[cardStyles.segment, index === i && cardStyles.activeSegment]}
             />
           ))}
         </View>
-
         <View style={cardStyles.overlay}>
           <View style={cardStyles.overlayRow}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -257,7 +234,15 @@ const SwipeableCard = () => {
             </View>
           </View>
 
-          <Text style={cardStyles.label}>Skill</Text>
+          <View style={cardStyles.labelRow}>
+            <Text style={cardStyles.label}>Skill</Text>
+            <TouchableOpacity
+              style={cardStyles.moreInfoBtn}
+              onPress={() => router.push("/moreInfo")}
+            >
+              <Text style={{ color: "#fff", fontSize: 11 }}>More Info</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={cardStyles.value}>React Native Developer</Text>
 
           <Text style={cardStyles.label}>Name</Text>
@@ -274,7 +259,7 @@ const SwipeableCard = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -397,7 +382,7 @@ const cardStyles = StyleSheet.create({
   overlay: {
     position: "absolute",
     bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     width: "100%",
     padding: 14,
   },
@@ -416,6 +401,11 @@ const cardStyles = StyleSheet.create({
     flexDirection: "row",
     gap: 2,
   },
+  labelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   label: {
     fontSize: 11,
     color: "#ccc",
@@ -432,5 +422,15 @@ const cardStyles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: "center",
+  },
+  moreInfoBtn: {
+    position: "absolute",
+  top: 14,
+  right: 14,
+  backgroundColor: "#FF3D34",
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 6,
+  zIndex: 10,
   },
 });
