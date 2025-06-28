@@ -19,6 +19,8 @@ import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { images } from "@/constants/images";
+import MatchModal from "../matchModal";
+
 
 export default function Index() {
   const router = useRouter();
@@ -27,6 +29,7 @@ export default function Index() {
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGender, setSelectedGender] = useState<"Male" | "Female">("Male");
+  const [matchVisible, setMatchVisible] = useState(false); // ✅ state for match modal
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -140,7 +143,7 @@ export default function Index() {
         {/* Cards */}
         <View style={{ marginTop: 30 }}>
           {[...Array(5)].map((_, index) => (
-            <SkillCard key={index} router={router} />
+            <SkillCard key={index} router={router} onMatch={() => setMatchVisible(true)} />
           ))}
         </View>
       </ScrollView>
@@ -193,11 +196,20 @@ export default function Index() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* ✅ Match Modal */}
+      <MatchModal visible={matchVisible} onClose={() => setMatchVisible(false)} />
     </View>
   );
 }
 
-const SkillCard = ({ router }: { router: any }) => {
+const SkillCard = ({
+  router,
+  onMatch,
+}: {
+  router: any;
+  onMatch: () => void;
+}) => {
   const images = [
     "https://i.pinimg.com/736x/8d/76/20/8d7620777b861070a2e07e9defd4879f.jpg",
     "https://via.placeholder.com/300x600.png?text=Portrait+2",
@@ -254,7 +266,7 @@ const SkillCard = ({ router }: { router: any }) => {
           <Text style={cardStyles.label}>Years of Experience</Text>
           <Text style={cardStyles.value}>5 years</Text>
 
-          <TouchableOpacity style={cardStyles.matchButton}>
+          <TouchableOpacity style={cardStyles.matchButton} onPress={onMatch}>
             <Text style={{ color: "#fff", fontWeight: "bold" }}>Match</Text>
           </TouchableOpacity>
         </View>
@@ -424,12 +436,12 @@ const cardStyles = StyleSheet.create({
     alignItems: "center",
   },
   moreInfoBtn: {
-    position: "absolute",
+  position: "absolute",
   top: 14,
-  right: 14,
+  right: 5,
   backgroundColor: "#FF3D34",
   paddingHorizontal: 10,
-  paddingVertical: 4,
+  paddingVertical: 10,
   borderRadius: 6,
   zIndex: 10,
   },

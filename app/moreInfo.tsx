@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -11,66 +11,66 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons, Entypo } from "@expo/vector-icons";
-import Toast, { BaseToast, ToastConfig } from "react-native-toast-message";
-import * as Location from "expo-location";
+import Toast from "react-native-toast-message";
 
 const dummyImages = [
-  "https://i.pinimg.com/736x/89/fa/ec/89faeceb9fe3ffe56a3a3c3aa831275f.jpg?text=Proof1",
-  "https://i.pinimg.com/736x/0d/14/94/0d1494e2ea7283d8bc00b22d41fdf673.jpg?text=Proof2",
-  "https://i.pinimg.com/736x/c2/22/22/c222225feb08bbc143741a82dfee2431.jpg?text=Proof3",
-  "https://i.pinimg.com/736x/17/ce/04/17ce041d312fa6d09c878ab31b318afd.jpg?text=Proof4",
-  "https://via.placeholder.com/150x150.png?text=Proof5",
-  "https://via.placeholder.com/150x150.png?text=Proof6",
-  "https://via.placeholder.com/150x150.png?text=Proof7",
-  "https://via.placeholder.com/150x150.png?text=Proof8",
+  "https://i.pinimg.com/736x/17/ce/04/17ce041d312fa6d09c878ab31b318afd.jpg?text=Proof1",
+  "https://i.pinimg.com/736x/00/a5/3e/00a53e462d010992000f879817d3a0db.jpg?text=Proof2",
+  "https://via.placeholder.com/150.png?text=Proof3",
+  "https://via.placeholder.com/150.png?text=Proof4",
+  "https://via.placeholder.com/150.png?text=Proof5",
+  "https://via.placeholder.com/150.png?text=Proof6",
+  "https://via.placeholder.com/150.png?text=Proof7",
+  "https://via.placeholder.com/150.png?text=Proof8",
 ];
 
-const toastConfig: ToastConfig = {
-  success: ({ text1 }) => (
-    <View style={styles.customToast}>
-      <Text style={styles.toastText}>{text1}</Text>
-    </View>
-  ),
-};
+const dummyReviews = [
+  {
+    name: "John Smith",
+    avatar: "https://avatar.iran.liara.run/public/45?text=JS",
+    review: "Great experience working with Jane!",
+    stars: 4,
+  },
+  {
+    name: "Emily Carter",
+    avatar: "https://via.placeholder.com/50.png?text=EC",
+    review: "Very professional and skilled.",
+    stars: 5,
+  },
+  {
+    name: "David Lee",
+    avatar: "https://via.placeholder.com/50.png?text=DL",
+    review: "Quick delivery and excellent communication.",
+    stars: 5,
+  },
+  {
+    name: "Sophia King",
+    avatar: "https://via.placeholder.com/50.png?text=SK",
+    review: "Highly recommended!",
+    stars: 4,
+  },
+  {
+    name: "Mark Patel",
+    avatar: "https://via.placeholder.com/50.png?text=MP",
+    review: "Good work overall, will hire again.",
+    stars: 3,
+  },
+];
 
 export default function MoreInfo() {
   const router = useRouter();
   const [selectedStars, setSelectedStars] = useState(0);
-  const [location, setLocation] = useState("Unknown");
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
-      const current = await Location.getCurrentPositionAsync({});
-      setLocation(`Lat: ${current.coords.latitude.toFixed(2)}, Lon: ${current.coords.longitude.toFixed(2)}`);
-    })();
-  }, []);
+  const [activeImage, setActiveImage] = useState(0);
 
   const handleRate = (stars: number) => {
     setSelectedStars(stars);
     Toast.show({
-      type: "success",
+      type: "info",
       text1: `You rated Jane Doe ${stars} star${stars > 1 ? "s" : ""}`,
-      position: "center",
+      position: "top",
       visibilityTime: 2000,
-      autoHide: true,
     });
-  };
-
-  const openModal = (index: number) => {
-    setCurrentImageIndex(index);
-    setModalVisible(true);
-  };
-
-  const navigateImage = (direction: "prev" | "next") => {
-    if (direction === "prev") {
-      setCurrentImageIndex((prev) => (prev - 1 + dummyImages.length) % dummyImages.length);
-    } else {
-      setCurrentImageIndex((prev) => (prev + 1) % dummyImages.length);
-    }
   };
 
   return (
@@ -85,100 +85,142 @@ export default function MoreInfo() {
         </View>
 
         <Text style={styles.sectionHeading}>Portfolio</Text>
-        <View style={styles.gridContainer}>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Skill</Text>
-            <Text style={styles.cardValue}>React Native Developer</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Name</Text>
-            <Text style={styles.cardValue}>Jane Doe</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Gender</Text>
-            <Text style={styles.cardValue}>Female</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Years of Experience</Text>
-            <Text style={styles.cardValue}>5 years</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Website Portfolio</Text>
-            <Text style={[styles.cardValue, { color: "#007AFF" }]}>https://janedoe.dev</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Location</Text>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Ionicons name="location" size={14} color="#444" style={{ marginRight: 6 }} />
-              <Text style={styles.cardValue}>{location}</Text>
+        <View style={styles.cardGrid}>
+          {[
+            { label: "Skill", value: "React Native Developer" },
+            { label: "Name", value: "Jane Doe" },
+            { label: "Gender", value: "Female" },
+            { label: "Years of Experience", value: "5 years" },
+            {
+              label: "Website Portfolio",
+              value: "https://janedoe.dev",
+              isLink: true,
+            },
+            {
+              label: "Location",
+              value: "Lagos, Nigeria",
+              icon: <Ionicons name="location" size={16} color="#FF3D34" />,
+            },
+          ].map((item, i) => (
+            <View key={i} style={styles.card}>
+              <Text style={styles.cardLabel}>{item.label}</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                {item.icon}
+                <Text
+                  style={[
+                    styles.cardValue,
+                    item.isLink && { color: "#007AFF" },
+                  ]}
+                >
+                  {item.value}
+                </Text>
+              </View>
             </View>
-          </View>
+          ))}
         </View>
 
-        <View style={styles.ratingWrapper}>
-          <Text style={styles.subHeading}>Overall Rating</Text>
+        <View style={styles.ratingSection}>
+          <Text style={styles.sectionHeading}>Overall Rating</Text>
           <View style={styles.starRow}>
             {[...Array(3)].map((_, i) => (
-              <Ionicons key={i} name="star" size={28} color="#FFD700" />
+              <Ionicons key={i} name="star" size={26} color="#FFD700" />
+            ))}
+          </View>
+
+          <Text style={styles.rateHeading}>Rate</Text>
+          <View style={styles.starRow}>
+            {[...Array(5)].map((_, i) => (
+              <TouchableOpacity key={i} onPress={() => handleRate(i + 1)}>
+                <Ionicons
+                  name="star"
+                  size={30}
+                  color={i < selectedStars ? "#FFD700" : "#ccc"}
+                />
+              </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        <Text style={styles.subHeading}>Rate</Text>
-        <View style={styles.starRow}>
-          {[...Array(5)].map((_, i) => (
-            <TouchableOpacity key={i} onPress={() => handleRate(i + 1)}>
-              <Ionicons
-                name="star"
-                size={36}
-                color={i < selectedStars ? "#FFD700" : "#ccc"}
-              />
-            </TouchableOpacity>
-          ))}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeading}>Proof of Work</Text>
+          <View style={styles.proofGrid}>
+            {dummyImages.map((uri, i) => (
+              <TouchableOpacity
+                key={i}
+                onPress={() => {
+                  setActiveImage(i);
+                  setModalVisible(true);
+                }}
+              >
+                <Image source={{ uri }} style={styles.proofImage} />
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
-        <Text style={styles.sectionHeading}>Proof of Work</Text>
-        <View style={styles.proofGrid}>
-          {dummyImages.map((uri, i) => (
-            <TouchableOpacity key={i} onPress={() => openModal(i)}>
-              <Image source={{ uri }} style={styles.proofImage} />
-            </TouchableOpacity>
+        <View style={styles.section}>
+          <Text style={styles.sectionHeading}>Reviews</Text>
+          {dummyReviews.map((review, i) => (
+            <View key={i} style={styles.reviewCard}>
+              <Image source={{ uri: review.avatar }} style={styles.avatar} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.reviewerName}>{review.name}</Text>
+                <View style={[styles.starRow, { justifyContent: "flex-start", marginTop: 4 }]}>
+                  {[...Array(review.stars)].map((_, j) => (
+                    <Ionicons key={j} name="star" size={16} color="#FFD700" />
+                  ))}
+                </View>
+                <Text style={styles.reviewText}>{review.review}</Text>
+              </View>
+            </View>
           ))}
         </View>
       </ScrollView>
 
       <Modal visible={modalVisible} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalBackdrop}>
           <Image
-            source={{ uri: dummyImages[currentImageIndex] }}
-            style={styles.lightboxImage}
+            source={{ uri: dummyImages[activeImage] }}
+            style={styles.modalImage}
             resizeMode="contain"
           />
+          <View style={styles.navArrows}>
+            <TouchableOpacity
+              disabled={activeImage === 0}
+              onPress={() => setActiveImage((prev) => prev - 1)}
+            >
+              <Ionicons name="chevron-back-circle" size={40} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              disabled={activeImage === dummyImages.length - 1}
+              onPress={() => setActiveImage((prev) => prev + 1)}
+            >
+              <Ionicons name="chevron-forward-circle" size={40} color="#fff" />
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
-            style={styles.closeButton}
             onPress={() => setModalVisible(false)}
+            style={styles.closeBtn}
           >
-            <Ionicons name="close-circle" size={32} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.leftArrow}
-            onPress={() => navigateImage("prev")}
-          >
-            <Ionicons name="chevron-back" size={32} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.rightArrow}
-            onPress={() => navigateImage("next")}
-          >
-            <Ionicons name="chevron-forward" size={32} color="#fff" />
+            <Ionicons name="close" size={28} color="#fff" />
           </TouchableOpacity>
         </View>
       </Modal>
 
-      <Toast config={toastConfig} />
+      <Toast
+        config={{
+          info: (props) => (
+            <View style={styles.toastContainer}>
+              <Text style={styles.toastText}>{props.text1}</Text>
+            </View>
+          ),
+        }}
+      />
     </View>
   );
 }
+
+const screenWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   contentContainer: {
@@ -205,104 +247,118 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sectionHeading: {
+    textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
     marginTop: 24,
-    marginBottom: 10,
-    textAlign: "center",
+    marginBottom: 16,
   },
-  subHeading: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginTop: 24,
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  gridContainer: {
+  cardGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    gap: 10,
+    justifyContent: "space-around",
+    gap: 12,
+    paddingHorizontal: 10,
   },
   card: {
-    backgroundColor: "#f7f7f7",
-    borderRadius: 10,
+    width: "46%",
+    backgroundColor: "#f9f9f9",
     padding: 12,
-    width: "48%",
-    marginBottom: 10,
+    borderRadius: 10,
+    marginBottom: 14,
   },
   cardLabel: {
     fontSize: 12,
-    color: "#999",
+    color: "#666",
   },
   cardValue: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#333",
+    color: "#000",
   },
-  ratingWrapper: {
-    marginTop: 16,
+  ratingSection: {
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  rateHeading: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 20,
+    marginBottom: 10,
   },
   starRow: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 10,
+    gap: 6,
+  },
+  section: {
+    paddingHorizontal: 20,
+    paddingTop: 30,
   },
   proofGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    gap: 10,
-    paddingHorizontal: 20,
-    marginTop: 12,
+    gap: 8,
+    marginTop: 10,
   },
   proofImage: {
-    width: (Dimensions.get("window").width - 60) / 2,
-    height: 150,
-    borderRadius: 10,
+    width: (screenWidth - 60) / 2,
+    height: 100,
+    borderRadius: 8,
   },
-  modalOverlay: {
+  reviewCard: {
+    flexDirection: "row",
+    marginBottom: 16,
+    gap: 12,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 10,
+    padding: 10,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  reviewerName: {
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  reviewText: {
+    fontSize: 13,
+    marginTop: 6,
+  },
+  modalBackdrop: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.9)",
     justifyContent: "center",
     alignItems: "center",
   },
-  lightboxImage: {
-    width: "90%",
-    height: "70%",
+  modalImage: {
+    width: screenWidth - 40,
+    height: 400,
+    marginBottom: 20,
   },
-  closeButton: {
+  navArrows: {
+    flexDirection: "row",
+    gap: 40,
+  },
+  closeBtn: {
     position: "absolute",
-    top: 50,
+    top: 40,
     right: 20,
   },
-  leftArrow: {
-    position: "absolute",
-    left: 20,
-    top: "50%",
-    transform: [{ translateY: -16 }],
-  },
-  rightArrow: {
-    position: "absolute",
-    right: 20,
-    top: "50%",
-    transform: [{ translateY: -16 }],
-  },
-  customToast: {
+  toastContainer: {
     backgroundColor: "#333",
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 10,
+    borderRadius: 12,
     alignSelf: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+    marginTop: 50,
   },
   toastText: {
     color: "#fff",
     fontSize: 13,
-    fontWeight: "500",
   },
 });
