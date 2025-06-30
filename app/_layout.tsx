@@ -1,6 +1,7 @@
 import { Slot, Stack } from "expo-router";
 import "./globals.css";
 import Toast from "react-native-toast-message";
+import { toastConfig } from "@/components/CustomToast";
 
 export default function RootLayout() {
   return (
@@ -12,7 +13,9 @@ export default function RootLayout() {
 
         <Stack.Screen name="moreInfo" options={{ headerShown: false }} />
       </Stack>
-      <Toast />
+
+      <Toast config={toastConfig} />
+      
     </>
   );
 }
