@@ -1,12 +1,176 @@
-import React from "react";
-import { View, Text } from "react-native";
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  TextInput,
+} from 'react-native';
+import { useRouter } from 'expo-router';
 
-const Chat = () => {
+const initialChats = [
+  {
+    id: '1',
+    name: 'Jane Doe',
+    skill: 'UI/UX Designer',
+    avatar: require('@/assets/images/avatar1.png'),
+    lastMessage: 'Hey, I just uploaded my portfolio!',
+    unread: true,
+    timestamp: '10:45 AM',
+  },
+  {
+    id: '2',
+    name: 'John Smith',
+    skill: 'Frontend Developer',
+    avatar: require('@/assets/images/avatar2.png'),
+    lastMessage: 'Sent you the files.',
+    unread: false,
+    timestamp: '9:30 AM',
+  },
+];
+
+export default function Chats() {
+  const router = useRouter();
+  const [chats, setChats] = useState(initialChats);
+  const [search, setSearch] = useState('');
+
+  const handlePressChat = (id: string) => {
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === id ? { ...chat, unread: false } : chat
+      )
+    );
+    router.push(`/chats/${id}`);
+  };
+
+  const filteredChats = chats
+    .filter((chat) =>
+      chat.name.toLowerCase().includes(search.toLowerCase())
+    )
+    .sort((a, b) => {
+      // Put unread messages at top
+      if (a.unread && !b.unread) return -1;
+      if (!a.unread && b.unread) return 1;
+      return 0;
+    });
+
   return (
-    <View>
-      <Text>Chats</Text>
+    <View style={styles.container}>
+      <Text style={styles.heading}>Chats</Text>
+
+      <TextInput
+        value={search}
+        onChangeText={setSearch}
+        placeholder="Search for chats"
+        style={styles.searchInput}
+        placeholderTextColor="#888"
+      />
+
+      <FlatList
+        data={filteredChats}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.chatItem}
+            onPress={() => handlePressChat(item.id)}
+          >
+            <Image source={item.avatar} style={styles.avatar} />
+            <View style={{ flex: 1 }}>
+              <View style={styles.topRow}>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.timestamp}>{item.timestamp}</Text>
+              </View>
+              <Text style={styles.skill}>{item.skill}</Text>
+              <View style={styles.messageRow}>
+                <Text style={styles.messagePreview}>{item.lastMessage}</Text>
+                {item.unread && (
+                  <View style={styles.unreadBadge}>
+                    <Text style={styles.unreadText}>New</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      />
     </View>
   );
-};
+}
 
-export default Chat;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  searchInput: {
+    height: 40,
+    borderRadius: 10,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    fontSize: 14,
+    color: '#000',
+  },
+  chatItem: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: '700',
+    flex: 1,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: '#999',
+    marginLeft: 10,
+  },
+  skill: {
+    fontSize: 12,
+    color: '#666',
+  },
+  messageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  messagePreview: {
+    fontSize: 13,
+    color: '#444',
+    flex: 1,
+  },
+  unreadBadge: {
+    backgroundColor: '#FF3D34',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginLeft: 10,
+  },
+  unreadText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+});
