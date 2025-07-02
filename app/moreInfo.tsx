@@ -16,42 +16,42 @@ import Toast from "react-native-toast-message";
 const dummyImages = [
   "https://i.pinimg.com/736x/17/ce/04/17ce041d312fa6d09c878ab31b318afd.jpg?text=Proof1",
   "https://i.pinimg.com/736x/00/a5/3e/00a53e462d010992000f879817d3a0db.jpg?text=Proof2",
-  "https://via.placeholder.com/150.png?text=Proof3",
-  "https://via.placeholder.com/150.png?text=Proof4",
-  "https://via.placeholder.com/150.png?text=Proof5",
-  "https://via.placeholder.com/150.png?text=Proof6",
-  "https://via.placeholder.com/150.png?text=Proof7",
-  "https://via.placeholder.com/150.png?text=Proof8",
+  "https://i.pinimg.com/736x/0d/14/94/0d1494e2ea7283d8bc00b22d41fdf673.jpg?text=Proof3",
+  "https://i.pinimg.com/736x/5a/cb/4a/5acb4ad15ae73b988bfef927336b5bab.jpg?text=Proof4",
+  "https://i.pinimg.com/736x/1e/6f/55/1e6f557ff71a6a7194b6f45aa9ae1516.jpg?text=Proof5",
+  "https://i.pinimg.com/736x/72/11/fb/7211fb4baa5a88c2d5bbe3a325e5d48f.jpg?text=Proof6",
+  "https://i.pinimg.com/736x/9f/ad/80/9fad800e43eb36b0314326bf5e983fce.jpg?text=Proof7",
+  "https://i.pinimg.com/736x/62/78/9f/62789f713475cf1be5e40e4150c63a11.jpg?text=Proof8",
 ];
 
 const dummyReviews = [
   {
     name: "John Smith",
-    avatar: "https://avatar.iran.liara.run/public/45?text=JS",
+    avatar: "https://i.pinimg.com/736x/bb/6a/ef/bb6aef8c1bd48cd8b3b41725eaba18e3.jpg?text=JS",
     review: "Great experience working with Jane!",
     stars: 4,
   },
   {
-    name: "Emily Carter",
-    avatar: "https://via.placeholder.com/50.png?text=EC",
+    name: "Layi Wasabi",
+    avatar: "https://i.pinimg.com/736x/a8/29/ae/a829ae32929de50f772278ce3fd5a4ba.jpg?text=EC",
     review: "Very professional and skilled.",
     stars: 5,
   },
   {
     name: "David Lee",
-    avatar: "https://via.placeholder.com/50.png?text=DL",
+    avatar: "https://i.pinimg.com/736x/0d/5a/60/0d5a60a562f8754e876a414b4dbce933.jpg?text=DL",
     review: "Quick delivery and excellent communication.",
     stars: 5,
   },
   {
     name: "Sophia King",
-    avatar: "https://via.placeholder.com/50.png?text=SK",
+    avatar: "https://i.pinimg.com/736x/0a/d6/81/0ad6818b2afe8d602c24989226a30b2e.jpg?text=SK",
     review: "Highly recommended!",
     stars: 4,
   },
   {
-    name: "Mark Patel",
-    avatar: "https://via.placeholder.com/50.png?text=MP",
+    name: "Lucia",
+    avatar: "https://i.pinimg.com/736x/89/5c/e9/895ce9b162a6dd229795babb12420b60.jpg?text=MP",
     review: "Good work overall, will hire again.",
     stars: 3,
   },
@@ -67,7 +67,7 @@ export default function MoreInfo() {
     setSelectedStars(stars);
     Toast.show({
       type: "info",
-      text1: `You rated Jane Doe ${stars} star${stars > 1 ? "s" : ""}`,
+      text1: `You rated Jude Bellingham ${stars} star${stars > 1 ? "s" : ""}`,
       position: "top",
       visibilityTime: 2000,
     });
@@ -81,19 +81,19 @@ export default function MoreInfo() {
 
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.videoBanner}>
-          <Entypo name="youtube" size={48} color="#fff" />
+          <Entypo name="youtube" size={48} color="#e50a0a" />
         </View>
 
         <Text style={styles.sectionHeading}>Portfolio</Text>
         <View style={styles.cardGrid}>
           {[
             { label: "Skill", value: "React Native Developer" },
-            { label: "Name", value: "Jane Doe" },
-            { label: "Gender", value: "Female" },
+            { label: "Name", value: "Jude Bellingham" },
+            { label: "Gender", value: "Male" },
             { label: "Years of Experience", value: "5 years" },
             {
               label: "Website Portfolio",
-              value: "https://janedoe.dev",
+              value: "https://judebell.dev",
               isLink: true,
             },
             {

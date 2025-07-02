@@ -23,21 +23,7 @@ type Message = {
 };
 
 const initialMessages: Message[] = [
-  {
-    id: "1",
-    text: "Hey, I just uploaded my portfolio!",
-    sender: "Jane Doe",
-    timestamp: "10:15 AM",
-    isSender: false,
-  },
-  {
-    id: "2",
-    text: "Looks great! Thanks for sharing.",
-    sender: "You",
-    timestamp: "10:16 AM",
-    status: "delivered",
-    isSender: true,
-  },
+ 
 ];
 
 export default function ChatDetail() {
@@ -88,12 +74,12 @@ export default function ChatDetail() {
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Image
-          source={require("@/assets/images/avatar1.png")}
+          source={require("@/assets/images/snw.jpg")}
           style={styles.avatar}
         />
         <View>
-          <Text style={styles.name}>Jane Doe</Text>
-          <Text style={styles.skill}>UI/UX Designer</Text>
+          <Text style={styles.name}>Jude Bellingham</Text>
+          <Text style={styles.skill}>React Native Developer</Text>
         </View>
       </View>
 
@@ -154,7 +140,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f7f7f7",
+    backgroundColor: "#9b9898",
     gap: 10,
   },
   avatar: { width: 42, height: 42, borderRadius: 21 },

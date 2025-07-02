@@ -43,10 +43,10 @@ export default function MatchModal({ visible, onClose }: { visible: boolean; onC
     <Modal visible={visible} transparent animationType="none">
       <View style={styles.overlay}>
         <Animated.View style={[styles.modalContainer, { transform: [{ translateY: slideAnim }] }]}>
-          <Text style={styles.title}>You matched with John Doe</Text>
+          <Text style={styles.title}>You matched with Jude Bellingham</Text>
           <Image
             source={{
-              uri: "https://via.placeholder.com/150x150.png?text=John+Doe",
+              uri: "https://i.pinimg.com/736x/c3/83/df/c383df6f147ac8b320f9061f5118294d.jpg?text=Jude+Bellingham",
             }}
             style={styles.image}
           />

@@ -211,9 +211,9 @@ const SkillCard = ({
   onMatch: () => void;
 }) => {
   const images = [
-    "https://i.pinimg.com/736x/8d/76/20/8d7620777b861070a2e07e9defd4879f.jpg",
-    "https://via.placeholder.com/300x600.png?text=Portrait+2",
-    "https://via.placeholder.com/300x600.png?text=Portrait+3",
+    "https://i.pinimg.com/736x/c3/83/df/c383df6f147ac8b320f9061f5118294d.jpg",
+    "https://i.pinimg.com/736x/38/14/3d/38143d47870166bdad8f399b08248ea8.jpg?text=Portrait+2",
+    "https://i.pinimg.com/736x/24/da/68/24da684a52ea6c4a54451d2508e2737e.jpg?text=Portrait+3",
   ];
   const [index, setIndex] = useState(0);
 
@@ -258,10 +258,10 @@ const SkillCard = ({
           <Text style={cardStyles.value}>React Native Developer</Text>
 
           <Text style={cardStyles.label}>Name</Text>
-          <Text style={cardStyles.value}>Jane Doe</Text>
+          <Text style={cardStyles.value}>Jude Bellingham</Text>
 
           <Text style={cardStyles.label}>Gender</Text>
-          <Text style={cardStyles.value}>Female</Text>
+          <Text style={cardStyles.value}>Male</Text>
 
           <Text style={cardStyles.label}>Years of Experience</Text>
           <Text style={cardStyles.value}>5 years</Text>
