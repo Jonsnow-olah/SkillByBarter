@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Toast, { BaseToastProps } from "react-native-toast-message";
+import { BaseToastProps } from "react-native-toast-message";
 
 export const toastConfig = {
   info: ({ text1 }: BaseToastProps) => (
@@ -8,9 +8,17 @@ export const toastConfig = {
       <Text style={styles.toastText}>{text1}</Text>
     </View>
   ),
+  success: ({ text1 }: BaseToastProps) => (
+    <View style={[styles.toastContainer, { backgroundColor: "#28a745" }]}>
+      <Text style={styles.toastText}>{text1}</Text>
+    </View>
+  ),
+  error: ({ text1 }: BaseToastProps) => (
+    <View style={[styles.toastContainer, { backgroundColor: "#dc3545" }]}>
+      <Text style={styles.toastText}>{text1}</Text>
+    </View>
+  ),
 };
-
-export default Toast;
 
 const styles = StyleSheet.create({
   toastContainer: {
@@ -18,7 +26,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 12,
-    maxWidth: "70%",
+    maxWidth: "80%",
     alignSelf: "center",
     marginTop: 40,
   },

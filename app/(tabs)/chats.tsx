@@ -59,7 +59,7 @@ export default function Chats() {
   const deleteChat = (id: string, name: string) => {
     setChats((prev) => prev.filter((chat) => chat.id !== id));
     Toast.show({
-      type: "success",
+      type: "info",
       text1: `You deleted chat with ${name}`,
       position: "top",
     });
@@ -106,7 +106,8 @@ export default function Chats() {
 
       <FlatList
         data={filteredChats}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => `chat-${item.id}`}
+        extraData={chats}
         renderItem={({ item }) => {
           let thisSwipeRef: any;
 
@@ -160,7 +161,15 @@ export default function Chats() {
         contentContainerStyle={{ paddingBottom: 40 }}
       />
 
-      <Toast />
+       <Toast
+              config={{
+                info: (props) => (
+                  <View style={styles.toastContainer}>
+                    <Text style={styles.toastText}>{props.text1}</Text>
+                  </View>
+                ),
+              }}
+            />
     </View>
   );
 }
@@ -248,5 +257,17 @@ const styles = StyleSheet.create({
     width: 70,
     borderRadius: 10,
     marginVertical: 6,
+  },
+  toastContainer: {
+    backgroundColor: "#333",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
+    alignSelf: "center",
+    marginTop: 50,
+  },
+  toastText: {
+    color: "#fff",
+    fontSize: 13,
   },
 });

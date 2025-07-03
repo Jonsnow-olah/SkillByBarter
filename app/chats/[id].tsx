@@ -22,18 +22,37 @@ type Message = {
   isSender: boolean;
 };
 
+const dummyChatUsers: Record<
+  string,
+  { name: string; skill: string; avatar: any }
+> = {
+  "1": {
+    name: "Jude Bellingham",
+    skill: "React Native Developer",
+    avatar: require("@/assets/images/jude.jpg"),
+  },
+  "2": {
+    name: "Olah Israel",
+    skill: "Frontend Developer",
+    avatar: require("@/assets/images/snw.jpg"),
+  },
+};
+
 const initialMessages: Message[] = [
- 
+  
 ];
 
 export default function ChatDetail() {
   const router = useRouter();
-  const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
 
-  // Automatically mark last sent message as read
+  const chatUser = dummyChatUsers[id || ""];
+
   useEffect(() => {
+    if (!chatUser) return;
+
     const lastSentIndex = [...messages]
       .reverse()
       .findIndex((msg) => msg.isSender && msg.status === "delivered");
@@ -62,6 +81,14 @@ export default function ChatDetail() {
     setMessage("");
   };
 
+  if (!chatUser) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.error}>User not found</Text>
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -73,13 +100,10 @@ export default function ChatDetail() {
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Image
-          source={require("@/assets/images/snw.jpg")}
-          style={styles.avatar}
-        />
+        <Image source={chatUser.avatar} style={styles.avatar} />
         <View>
-          <Text style={styles.name}>Jude Bellingham</Text>
-          <Text style={styles.skill}>React Native Developer</Text>
+          <Text style={styles.name}>{chatUser.name}</Text>
+          <Text style={styles.skill}>{chatUser.skill}</Text>
         </View>
       </View>
 
@@ -95,9 +119,7 @@ export default function ChatDetail() {
               item.isSender ? styles.sentBubble : styles.receivedBubble,
             ]}
           >
-            <Text style={styles.messageText}>
-              {item.text}
-            </Text>
+            <Text style={styles.messageText}>{item.text}</Text>
             <View style={styles.metaRow}>
               <Text style={styles.timestamp}>{item.timestamp}</Text>
               {item.isSender && item.status && (
@@ -134,6 +156,12 @@ export default function ChatDetail() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
+  error: {
+    paddingTop: 60,
+    textAlign: "center",
+    fontSize: 18,
+    color: "#333",
+  },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
