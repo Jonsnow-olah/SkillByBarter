@@ -9,9 +9,12 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  Modal,
+  Alert,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 
 type Message = {
   id: string;
@@ -38,15 +41,14 @@ const dummyChatUsers: Record<
   },
 };
 
-const initialMessages: Message[] = [
-  
-];
+const initialMessages: Message[] = [];
 
 export default function ChatDetail() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const chatUser = dummyChatUsers[id || ""];
 
@@ -81,6 +83,33 @@ export default function ChatDetail() {
     setMessage("");
   };
 
+  const handleRemoveMatch = () => {
+    Alert.alert(
+      "Confirm Remove Match",
+      `Are you sure you want to remove ${chatUser.name}?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Yes, Remove",
+          style: "destructive",
+          onPress: () => {
+            setModalVisible(false);
+
+            Toast.show({
+              type: "info",
+              text1: `You removed match with ${chatUser.name}`,
+              position: "top",
+            });
+
+            setTimeout(() => {
+              router.replace("/chats");
+            }, 1000);
+          },
+        },
+      ]
+    );
+  };
+
   if (!chatUser) {
     return (
       <View style={styles.container}>
@@ -101,10 +130,13 @@ export default function ChatDetail() {
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Image source={chatUser.avatar} style={styles.avatar} />
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.name}>{chatUser.name}</Text>
           <Text style={styles.skill}>{chatUser.skill}</Text>
         </View>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <Ionicons name="ellipsis-vertical" size={22} color="#333" />
+        </TouchableOpacity>
       </View>
 
       {/* Messages */}
@@ -150,6 +182,49 @@ export default function ChatDetail() {
           <Ionicons name="send" size={24} color="#007AFF" />
         </TouchableOpacity>
       </View>
+
+      {/* Bottom Sheet Modal */}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.overlay}
+          onPress={() => setModalVisible(false)}
+        >
+          <View style={styles.sheet}>
+            <View style={styles.sheetHeader}>
+              <View style={{ flex: 1 }} />
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.sheetItem}>
+              <Ionicons name="flag" size={20} color="#FF3D34" style={styles.icon} />
+              <View>
+                <Text style={styles.sheetTitle}>Report {chatUser.name}</Text>
+                <Text style={styles.sheetSubtext}>
+                  Don't worry, they won't know you reported them
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.sheetItem} onPress={handleRemoveMatch}>
+              <Ionicons name="ban" size={20} color="#FF3D34" style={styles.icon} />
+              <View>
+                <Text style={styles.sheetTitle}>Remove Match</Text>
+                <Text style={styles.sheetSubtext}>
+                  If you remove them, they won't be able to contact you again
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -224,5 +299,41 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 15,
     fontSize: 14,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  sheet: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  sheetHeader: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: 20,
+  },
+  sheetItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 30,
+  },
+  icon: {
+    marginRight: 15,
+    marginTop: 4,
+  },
+  sheetTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111",
+  },
+  sheetSubtext: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 2,
+    width: "90%",
   },
 });
