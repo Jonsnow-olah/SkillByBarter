@@ -49,12 +49,12 @@ export default function ChatDetail() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [modalVisible, setModalVisible] = useState(false);
+  const [reportOptionsVisible, setReportOptionsVisible] = useState(false);
 
   const chatUser = dummyChatUsers[id || ""];
 
   useEffect(() => {
     if (!chatUser) return;
-
     const lastSentIndex = [...messages]
       .reverse()
       .findIndex((msg) => msg.isSender && msg.status === "delivered");
@@ -69,7 +69,6 @@ export default function ChatDetail() {
 
   const sendMessage = () => {
     if (!message.trim()) return;
-
     const newMessage: Message = {
       id: Date.now().toString(),
       text: message,
@@ -78,7 +77,6 @@ export default function ChatDetail() {
       status: "delivered",
       isSender: true,
     };
-
     setMessages((prev) => [...prev, newMessage]);
     setMessage("");
   };
@@ -94,13 +92,11 @@ export default function ChatDetail() {
           style: "destructive",
           onPress: () => {
             setModalVisible(false);
-
             Toast.show({
               type: "info",
               text1: `You removed match with ${chatUser.name}`,
               position: "top",
             });
-
             setTimeout(() => {
               router.replace("/chats");
             }, 1000);
@@ -109,6 +105,14 @@ export default function ChatDetail() {
       ]
     );
   };
+
+  const reportReasons = [
+    { label: "Impersonation", icon: "person" },
+    { label: "Abusive comments", icon: "chatbubble-ellipses" },
+    { label: "Inappropriate content", icon: "warning" },
+    { label: "Scam", icon: "alert-circle" },
+    { label: "I'm not interested in this person", icon: "remove-circle" },
+  ];
 
   if (!chatUser) {
     return (
@@ -129,11 +133,21 @@ export default function ChatDetail() {
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Image source={chatUser.avatar} style={styles.avatar} />
-        <View style={{ flex: 1 }}>
+
+        {/* Avatar pressable */}
+        <TouchableOpacity onPress={() => router.push(`/profile/${id}`)}>
+          <Image source={chatUser.avatar} style={styles.avatar} />
+        </TouchableOpacity>
+
+        {/* Name and skill pressable */}
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          onPress={() => router.push(`/profile/${id}`)}
+        >
           <Text style={styles.name}>{chatUser.name}</Text>
           <Text style={styles.skill}>{chatUser.skill}</Text>
-        </View>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           <Ionicons name="ellipsis-vertical" size={22} color="#333" />
         </TouchableOpacity>
@@ -183,7 +197,7 @@ export default function ChatDetail() {
         </TouchableOpacity>
       </View>
 
-      {/* Bottom Sheet Modal */}
+      {/* Main Options Modal */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -203,7 +217,13 @@ export default function ChatDetail() {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.sheetItem}>
+            <TouchableOpacity
+              style={styles.sheetItem}
+              onPress={() => {
+                setModalVisible(false);
+                setTimeout(() => setReportOptionsVisible(true), 300);
+              }}
+            >
               <Ionicons name="flag" size={20} color="#FF3D34" style={styles.icon} />
               <View>
                 <Text style={styles.sheetTitle}>Report {chatUser.name}</Text>
@@ -222,6 +242,54 @@ export default function ChatDetail() {
                 </Text>
               </View>
             </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Report Options Modal */}
+      <Modal
+        visible={reportOptionsVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setReportOptionsVisible(false)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.overlay}
+          onPress={() => setReportOptionsVisible(false)}
+        >
+          <View style={styles.sheet}>
+            <View style={styles.sheetHeader}>
+              <Text style={[styles.sheetTitle, { fontSize: 18 }]}>
+                Report {chatUser.name}
+              </Text>
+              <TouchableOpacity onPress={() => setReportOptionsVisible(false)}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ marginBottom: 10 }} />
+
+            {reportReasons.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={{ ...styles.sheetItem, marginBottom: 20 }}
+                onPress={() =>
+                  router.push({
+                    pathname: "/chats/report",
+                    params: { reason: item.label, name: chatUser.name },
+                  })
+                }
+              >
+                <Ionicons
+                  name={item.icon as any}
+                  size={20}
+                  color="#FF3D34"
+                  style={styles.icon}
+                />
+                <Text style={styles.sheetTitle}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </TouchableOpacity>
       </Modal>
@@ -264,9 +332,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: "#555",
   },
-  messageText: {
-    color: "#fff",
-  },
+  messageText: { color: "#fff" },
   metaRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -313,21 +379,21 @@ const styles = StyleSheet.create({
   },
   sheetHeader: {
     flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 20,
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
   },
   sheetItem: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 30,
+    alignItems: "center",
+    marginTop: 20,
   },
   icon: {
     marginRight: 15,
-    marginTop: 4,
   },
   sheetTitle: {
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
     color: "#111",
   },
   sheetSubtext: {

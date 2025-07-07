@@ -14,6 +14,7 @@ export default function RootLayout() {
           <Stack.Screen name="notifications" options={{ headerShown: false }} />
           <Stack.Screen name="moreInfo" options={{ headerShown: false }} />
           <Stack.Screen name="chats/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="chats/report" options={{ headerShown: false }} />
         </Stack>
 
         <Toast config={toastConfig} />
