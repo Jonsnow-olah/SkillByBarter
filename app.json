@@ -14,21 +14,22 @@
     },
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.SkillByBarter-App"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/barter_logo.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.SkillByBarter_App"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/barter_logo.png"
     },
-
     "experiments": {
       "typedRoutes": true
     }
