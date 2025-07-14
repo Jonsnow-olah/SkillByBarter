@@ -1,12 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
+  View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
@@ -14,14 +8,11 @@ import Toast from "react-native-toast-message";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Profile() {
+  const maxProof = 8;
   const [introVideo, setIntroVideo] = useState<string | null>(null);
-  const [thumbPics, setThumbPics] = useState<string[]>([
-    "https://i.pinimg.com/736x/c3/83/df/c383df6f147ac8b320f9061f5118294d.jpg",
-    "https://i.pinimg.com/736x/38/14/3d/38143d47870166bdad8f399b08248ea8.jpg",
-  ]);
-  const [proofPics, setProofPics] = useState<(string | null)[]>(
-    Array(8).fill(null)
-  );
+  const [thumbPics, setThumbPics] = useState<string[]>([]);
+  const [proofPics, setProofPics] = useState<string[]>([]);
+
   const [fullName, setFullName] = useState("");
   const [skill, setSkill] = useState("");
   const [skillLearn, setSkillLearn] = useState("");
@@ -30,23 +21,17 @@ export default function Profile() {
   const [locationAddress, setLocationAddress] = useState("");
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
-  const markChanged = useCallback(() => {
-    setUnsavedChanges(true);
-  }, []);
+  const markChanged = useCallback(() => setUnsavedChanges(true), []);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status === "granted") {
         let { coords } = await Location.getCurrentPositionAsync({});
-        let reverse = await Location.reverseGeocodeAsync({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-        });
-        if (reverse.length > 0) {
-          let addr = reverse[0];
-          let formatted = `${addr.city || ""}, ${addr.region || ""}, ${addr.country || ""}`;
-          setLocationAddress(formatted);
+        let rev = await Location.reverseGeocodeAsync(coords);
+        if (rev[0]) {
+          const addr = rev[0];
+          setLocationAddress(`${addr.city}, ${addr.region}, ${addr.country}`);
         }
       }
     })();
@@ -56,43 +41,55 @@ export default function Profile() {
     onPicked: (uri: string) => void,
     mediaTypes: ImagePicker.MediaTypeOptions
   ) => {
-    let result = await ImagePicker.launchImageLibraryAsync({ mediaTypes, quality: 0.7 });
-    if (!result.canceled) {
-      onPicked(result.assets[0].uri);
+    let r = await ImagePicker.launchImageLibraryAsync({ mediaTypes, quality: 0.7 });
+    if (!r.canceled) {
+      onPicked(r.assets[0].uri);
       markChanged();
     }
   };
 
+  const pickProof = () =>
+    pickMedia((u) => {
+      if (proofPics.length < maxProof) {
+        setProofPics((p) => [...p, u]);
+      }
+    }, ImagePicker.MediaTypeOptions.Images);
+
+  const confirmDeletePic = (uri: string, type: "thumb" | "proof") => {
+    Alert.alert("Delete Image", "Are you sure you want to delete this image?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          if (type === "proof") {
+            setProofPics((prev) => prev.filter((p) => p !== uri));
+          } else {
+            setThumbPics((prev) => prev.filter((p) => p !== uri));
+          }
+          markChanged();
+          Toast.show({ type: "info", text1: "Image deleted" });
+        },
+      },
+    ]);
+  };
+
   const pickIntroVideo = () =>
-    pickMedia((uri) => setIntroVideo(uri), ImagePicker.MediaTypeOptions.Videos);
-  const pickThumbPic = (index: number) =>
-    pickMedia((uri) => {
+    pickMedia((u) => setIntroVideo(u), ImagePicker.MediaTypeOptions.Videos);
+
+  const pickThumbPic = (idx: number) =>
+    pickMedia((u) => {
       const arr = [...thumbPics];
-      arr[index] = uri;
+      arr[idx] = u;
       setThumbPics(arr);
     }, ImagePicker.MediaTypeOptions.Images);
-  const pickProofPic = (index: number) =>
-    pickMedia((uri) => {
-      const arr = [...proofPics];
-      arr[index] = uri;
-      setProofPics(arr);
-    }, ImagePicker.MediaTypeOptions.Images);
-
-  const hasProof = proofPics.some((uri) => uri !== null);
 
   const handleSave = () => {
-    if (!fullName || !skill || !skillLearn || !gender || !yearsExp || !hasProof) {
-      Toast.show({
-        type: "info",
-        text1: "Fill all the required fields",
-      });
+    if (!fullName || !skill || !skillLearn || !gender || !yearsExp || proofPics.length === 0) {
+      Toast.show({ type: "info", text1: "Fill all the required fields" });
       return;
     }
-
-    Toast.show({
-      type: "info",
-      text1: "Profile successfully updated",
-    });
+    Toast.show({ type: "info", text1: "Profile successfully updated" });
     setUnsavedChanges(false);
   };
 
@@ -111,27 +108,29 @@ export default function Profile() {
         </TouchableOpacity>
 
         <View style={styles.pictureRow}>
-          {thumbPics.slice(0, 2).map((uri, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={styles.picThumb}
-              onPress={() => pickThumbPic(idx)}
-            >
+          {thumbPics.map((uri, idx) => (
+            <View key={idx} style={styles.picWrapper}>
               <Image source={{ uri }} style={styles.picThumb} />
-            </TouchableOpacity>
-          ))}
-          <TouchableOpacity
-            style={styles.picThumb}
-            onPress={() => pickThumbPic(thumbPics.length)}
-          >
-            <View style={styles.plusBox}>
-              <Ionicons name="add" size={40} color="#888" />
-              <Text style={styles.plusText}>Upload</Text>
+              <TouchableOpacity
+                style={styles.deleteIconSmall}
+                onPress={() => confirmDeletePic(uri, "thumb")}
+              >
+                <Ionicons name="close-circle" size={24} color="#fff" />
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
+          ))}
+          {thumbPics.length < 3 && (
+            <TouchableOpacity
+              style={styles.picThumb}
+              onPress={() => pickThumbPic(thumbPics.length)}
+            >
+              <View style={styles.plusBox}>
+                <Ionicons name="add" size={40} color="#888" />
+                <Text style={styles.plusText}>Upload</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
-
-        <Text style={styles.sectionTitle}>Profile</Text>
 
         <TextInput
           style={styles.input}
@@ -185,26 +184,27 @@ export default function Profile() {
           editable={false}
         />
 
-        <Text style={[styles.sectionTitle, { marginTop: 20 }]}>
-          Proof of Work (required)
-        </Text>
+        <Text style={styles.sectionTitle}>Proof of Work (required)</Text>
+        <Text style={styles.subText}>You can upload up to 8 photos</Text>
         <View style={styles.proofGrid}>
-          {proofPics.map((uri, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={styles.proofCard}
-              onPress={() => pickProofPic(idx)}
-            >
-              {uri ? (
-                <Image source={{ uri }} style={styles.proofCard} />
-              ) : (
-                <View style={styles.plusBox}>
-                  <Ionicons name="add" size={32} color="#888" />
-                  <Text style={styles.plusText}>Upload proof</Text>
-                </View>
-              )}
-            </TouchableOpacity>
+          {proofPics.map((uri) => (
+            <View key={uri} style={styles.proofCardWrapper}>
+              <Image source={{ uri }} style={styles.proofCard} />
+              <TouchableOpacity
+                style={styles.deleteIconSmall}
+                onPress={() => confirmDeletePic(uri, "proof")}
+              >
+                <Ionicons name="close-circle" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
           ))}
+          {proofPics.length < maxProof && (
+            <TouchableOpacity style={styles.proofCardWrapper} onPress={pickProof}>
+              <View style={styles.plusBoxProof}>
+                <Ionicons name="add" size={32} color="#888" />
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
 
         <TouchableOpacity
@@ -234,47 +234,23 @@ export default function Profile() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-  topSpacing: { paddingTop: 40 },
+  topSpacing: { paddingTop: 40, paddingBottom: 40 },
   videoHeading: { fontSize: 16, fontWeight: "600", textAlign: "center", marginTop: 20 },
   videoSub: { fontSize: 13, color: "#666", textAlign: "center", marginBottom: 12 },
   videoBanner: {
     marginHorizontal: 20,
-    width: "90%",
     height: 140,
-    backgroundColor: "#ddd",
+    backgroundColor: "#ccc",
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    alignSelf: "center",
   },
   videoBannerText: { color: "#555", fontSize: 14 },
-  pictureRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 20,
-  },
-  picThumb: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
-  },
-  plusBox: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  plusText: {
-    color: "#888",
-    fontSize: 12,
-    marginTop: 4,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginHorizontal: 20,
-    marginTop: 10,
-  },
+  pictureRow: { flexDirection: "row", paddingHorizontal: 20, marginVertical: 20 },
+  picWrapper: { position: "relative", marginRight: 10 },
+  picThumb: { width: 100, height: 100, borderRadius: 8, backgroundColor: "#eee" },
+  plusBox: { flex: 1, alignItems: "center", justifyContent: "center" },
+  plusText: { color: "#888", fontSize: 12, marginTop: 4 },
   input: {
     marginHorizontal: 20,
     marginTop: 12,
@@ -284,23 +260,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     height: 40,
   },
-  locationLabel: {
-    marginHorizontal: 20,
-    marginTop: 12,
-    fontSize: 13,
-    color: "#444",
-  },
+  sectionTitle: { marginHorizontal: 20, fontSize: 18, fontWeight: "600", marginTop: 20 },
+  subText: { marginHorizontal: 20, fontSize: 13, color: "#666", marginBottom: 8 },
   proofGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    margin: 20,
+    marginHorizontal: 20,
     justifyContent: "space-between",
   },
-  proofCard: {
+  proofCardWrapper: {
     width: "48%",
     height: 120,
-    borderRadius: 8,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    position: "relative",
+    overflow: "hidden",
+  },
+  proofCard: { width: "100%", height: "100%" },
+  plusBoxProof: { flex: 1, alignItems: "center", justifyContent: "center" },
+  deleteIconSmall: {
+    position: "absolute", top: 4, right: 4,
+    backgroundColor: "rgba(0,0,0,0.4)", borderRadius: 12,
   },
   saveButton: {
     backgroundColor: "#FF3D34",
@@ -308,11 +290,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 10,
     alignItems: "center",
-    marginBottom: 40,
+    marginTop: 20,
   },
   saveButtonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-
-  // TOAST STYLES
   toastContainer: {
     backgroundColor: "#333",
     paddingHorizontal: 14,
@@ -321,8 +301,5 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 50,
   },
-  toastText: {
-    color: "#fff",
-    fontSize: 13,
-  },
+  toastText: { color: "#fff", fontSize: 13 },
 });
