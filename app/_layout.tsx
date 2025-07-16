@@ -1,31 +1,45 @@
+// app/_layout.tsx
+
 import { Stack } from "expo-router";
 import "./globals.css";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "@/components/CustomToast";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
+import IntroVideoScreen from "./IntroVideoScreen";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  return (
-    <GestureHandlerRootView style={styles.gestureContainer}>
-      <>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="notifications" options={{ headerShown: false }} />
-          <Stack.Screen name="moreInfo" options={{ headerShown: false }} />
-          <Stack.Screen name="chats/[id]" options={{ headerShown: false }} />
-          <Stack.Screen name="chats/report" options={{ headerShown: false }} />
-          <Stack.Screen name="community/[id]" options={{ headerShown: false }} />
-        </Stack>
+  const [showIntro, setShowIntro] = useState(true);
 
-        <Toast config={toastConfig} />
-      </>
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
+
+  return (
+    <GestureHandlerRootView style={styles.container}>
+      {showIntro ? (
+        <IntroVideoScreen onFinish={() => setShowIntro(false)} />
+      ) : (
+        <View style={styles.container}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="notifications" />
+            <Stack.Screen name="moreInfo" />
+            <Stack.Screen name="chats/[id]" />
+            <Stack.Screen name="chats/report" />
+            <Stack.Screen name="community/[id]" />
+          </Stack>
+          <Toast config={toastConfig} />
+        </View>
+      )}
     </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
-  gestureContainer: {
-    flex: 1,
-  },
+  container: { flex: 1 },
 });
