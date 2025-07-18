@@ -1,31 +1,23 @@
-// app/_layout.tsx
-
 import { Stack } from "expo-router";
 import "./globals.css";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "@/components/CustomToast";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import * as SplashScreen from "expo-splash-screen";
-import IntroVideoScreen from "./IntroVideoScreen";
-
-SplashScreen.preventAutoHideAsync();
+import { useState } from "react";
+import { StyleSheet } from "react-native";
+import IntroVideoScreen from "../app/intro";
 
 export default function RootLayout() {
-  const [showIntro, setShowIntro] = useState(true);
-
-  useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
+  const [introDone, setIntroDone] = useState(false);
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      {showIntro ? (
-        <IntroVideoScreen onFinish={() => setShowIntro(false)} />
+      { !introDone ? (
+        <IntroVideoScreen onFinish={() => setIntroDone(true)} />
       ) : (
-        <View style={styles.container}>
+        <>
           <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="auth/index" />
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="notifications" />
             <Stack.Screen name="moreInfo" />
@@ -34,7 +26,7 @@ export default function RootLayout() {
             <Stack.Screen name="community/[id]" />
           </Stack>
           <Toast config={toastConfig} />
-        </View>
+        </>
       )}
     </GestureHandlerRootView>
   );
