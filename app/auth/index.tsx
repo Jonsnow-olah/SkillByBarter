@@ -1,85 +1,62 @@
 import React, { useState } from "react";
-import {
-  View, Text, StyleSheet, Image, TextInput,
-  TouchableOpacity, Alert
-} from "react-native";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { useRouter, Stack } from "expo-router";
+import Toast from "react-native-toast-message";
+import { GoogleSigninButton } from "@react-native-google-signin/google-signin";
 
 export default function AuthScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
 
-  const handleNext = () => {
-    if (!email.includes("@")) {
-      Alert.alert("Invalid Email", "Please enter a valid email address.");
-      return;
-    }
-    router.push("/signup?email=" + encodeURIComponent(email));
+  const handleGoogle = () => {
+    console.log("Google sign-in pressed");
+    // placeholder for google auth flow
   };
 
-  const handleGoogle = () => {
-    // Google auth placeholder
-    Alert.alert("Google login not implemented yet");
+  const handleNext = () => {
+    if (!email.includes("@")) {
+      Toast.show({ type: "info", text1: "Enter a valid email" });
+      return;
+    }
+    router.push({ pathname: "/auth/code", params: { email } });
   };
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
       <Image source={require("../../assets/images/barter_logo.png")} style={styles.logo} />
-      <Text style={styles.heading}>Sign in or Sign up</Text>
-
-      <TouchableOpacity style={styles.googleBtn} onPress={handleGoogle}>
-        <Ionicons name="logo-google" size={24} color="#fff" />
-        <Text style={styles.googleText}>Continue with Google</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.orText}>OR</Text>
-
-      <View style={styles.emailContainer}>
+      <GoogleSigninButton onPress={handleGoogle} />
+      <View style={styles.orRow}>
+        <View style={styles.line} />
+        <Text style={styles.orText}>OR</Text>
+        <View style={styles.line} />
+      </View>
+      <View style={styles.emailRow}>
         <TextInput
-          style={styles.emailInput}
-          placeholder="Your email address"
+          style={styles.input}
+          placeholder="Enter your email"
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
         />
         <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
-          <Ionicons name="arrow-forward" size={24} color="#fff" />
+          <Text style={styles.nextText}>Next</Text>
         </TouchableOpacity>
       </View>
+      <Toast />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center", backgroundColor: "#fff" },
-  logo: { width: 120, height: 120, alignSelf: "center", marginBottom: 30 },
-  heading: { fontSize: 20, fontWeight: "600", textAlign: "center", marginBottom: 20 },
-  googleBtn: {
-    flexDirection: "row",
-    backgroundColor: "#4285F4",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 8,
-    justifyContent: "center",
-  },
-  googleText: { color: "#fff", marginLeft: 10, fontSize: 16 },
-  orText: { textAlign: "center", marginVertical: 20, color: "#777" },
-  emailContainer: { flexDirection: "row", alignItems: "center" },
-  emailInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 50,
-  },
-  nextBtn: {
-    marginLeft: 10,
-    backgroundColor: "#d43c4f",
-    padding: 12,
-    borderRadius: 8,
-    justifyContent: "center",
-  },
+  container: { flex: 1, padding: 20, justifyContent: "center", alignItems: "center" },
+  logo: { width: 120, height: 120, marginBottom: 40, resizeMode: "contain" },
+  orRow: { flexDirection: "row", alignItems: "center", marginVertical: 20, width: "80%" },
+  line: { flex: 1, height: 1, backgroundColor: "#ccc" },
+  orText: { marginHorizontal: 10, color: "#888" },
+  emailRow: { flexDirection: "row", width: "100%", alignItems: "center" },
+  input: { flex: 1, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 10 },
+  nextBtn: { marginLeft: 10, backgroundColor: "#d43c4f", paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8 },
+  nextText: { color: "#fff", fontWeight: "600" },
 });

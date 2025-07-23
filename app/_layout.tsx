@@ -16,14 +16,14 @@ export default function RootLayout() {
         <IntroVideoScreen onFinish={() => setIntroDone(true)} />
       ) : (
         <>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="auth/index" />
+          <Stack screenOptions={{ headerShown: false }}> 
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="notifications" />
             <Stack.Screen name="moreInfo" />
             <Stack.Screen name="chats/[id]" />
             <Stack.Screen name="chats/report" />
             <Stack.Screen name="community/[id]" />
+            <Stack.Screen name="auth/index" />
           </Stack>
           <Toast config={toastConfig} />
         </>

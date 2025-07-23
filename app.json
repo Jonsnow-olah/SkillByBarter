@@ -23,7 +23,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.SkillByBarter_App"
+      "package": "com.anonymous.SkillByBarter_App",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",

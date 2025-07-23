@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "466666548811",
+    "project_id": "skillbybarter",
+    "storage_bucket": "skillbybarter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:466666548811:android:4809421b7723f971dfe7ce",
+        "android_client_info": {
+          "package_name": "com.anonymous.SkillByBarter_App"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUkvDlkjhFGlbXJ8J2YFsG8pt5RIjjxro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
