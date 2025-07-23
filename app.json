@@ -40,7 +40,7 @@
       }
     },
     "plugins": [
-      "expo-video"
+      "expo-av"
     ]
   }
 }
